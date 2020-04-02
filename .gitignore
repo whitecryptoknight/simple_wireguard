@@ -1,0 +1,5 @@
+wg_privkey
+wg_pubkey
+*.conf
+*.priv
+*.pub
