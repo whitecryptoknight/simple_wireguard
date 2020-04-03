@@ -7,6 +7,7 @@ server_pubkey="wg_pubkey"
 default_port=51820
 
 RED='\033[1;31m'
+CYAN='\033[0;36m'
 NC='\033[0m'
 
 server_conf_template="[Interface]
@@ -35,12 +36,7 @@ PersistentKeepalive = 21
 
 if [[ $1 == "init" ]]
 then
-
-    if [[ $2 == "" ]]
-    then
-        echo "Usage: "$0" init <interface name>"
-        exit 1
-    fi
+    [[ $# < 2 ]] && "$0" && exit 1
 
     # add repo
     add-apt-repository -y ppa:wireguard/wireguard
@@ -78,11 +74,7 @@ then
     exit 1
 elif [[ $1 == "add" ]]
 then
-    if [[ $# != 3 ]]
-    then
-        echo "Usage: "$0" add <client_name> <10.10.10.x>"
-        exit 1
-    fi
+    [[ $# != 3 ]] && "$0" && exit 1
 
     grep -q "$3" "$cfg_file" && echo "Client IP already exists, choose other than "$3"" && exit 1
     [[ ! -z "$(find . -name "$2".conf)" ]] && echo "Client Name already exists, choose other than "$2"" && exit 1
@@ -114,11 +106,7 @@ then
     echo -e "${RED}Config saved at $(readlink -f "$client_conf_path") ,copy to /etc/wireguard/ on client and run \"wg-quick up "$2"\" or use QR code above${NC}"
 elif [[ $1 == "del" ]]
 then
-    if [[ $# != 2 ]]
-    then
-        echo "Usage: "$0" del <client_name>"
-        exit 1
-    fi
+    [[ $# != 2 ]] && "$0" && exit 1
 
     # find client config
     content=$(cat "$2".pub 2>/dev/null); [[ ! $content ]] && echo ""$2" : client not found" && exit 1
@@ -136,18 +124,22 @@ then
     wg addconf "$wg_iface" <(wg-quick strip "$wg_iface")
 
     echo -e "${RED}Client "$2" has been deleted${NC}"
+elif [[ $1 == "list" ]]
+then
+    find . -name '*.conf' \
+           -exec sh -c "basename {} | xargs echo -n | cut -d "." -f 1 | tr -d '\n'" \; `#client name` \
+           -exec sh -c "echo -n ' ';grep -i address {}| cut -d ' ' -f3|tr -d '\n'" \; `#ip address` \
+           -exec sh -c "echo -n ' ';grep -i publickey {}|cut -d ' ' -f3" \; `#public key` \
+           | sort -t . -k 3,3n -k 4,4n `#sort by ip` \
+           | xargs -I {} echo -e "${CYAN}{}${NC}" `#print in color`
 elif [[ $1 == "qr" ]]
 then
-    if [[ $# != 2 ]]
-    then
-        echo "Usage: "$0" qr <client_name>"
-        exit 1
-    fi
-
+    [[ $# != 2 ]] && "$0" && exit 1
     qrencode -t ansiutf8 < "$2".conf
 else
     echo -e "Usage:\t "$0" init <interface name>
     \t "$0" add <client_name> <10.10.10.x>
     \t "$0" del <client_name>
+    \t "$0" list
     \t "$0" qr <client_name>"
 fi

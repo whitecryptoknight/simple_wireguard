@@ -2,7 +2,7 @@
 
 ### 1. Clone this repo  
 ```
-git clone git@github.com:finzzz/simple_wireguard.git
+git clone https://github.com/finzzz/simple_wireguard.git
 ```
 
 ### 2. Navigate to the directory  
@@ -34,6 +34,12 @@ ifconfig
 ### Delete client
 ```
 ./simple_wg.sh del john
+```
+
+***
+### List clients
+```
+./simple_wg.sh list
 ```
   
 ***
