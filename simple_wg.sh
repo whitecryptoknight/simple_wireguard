@@ -51,6 +51,8 @@ then
 
     # create config file
     umask 077
+    rm SERVER_ADDR
+    [ $3 ] && echo "$3" > SERVER_ADDR
     echo "$server_conf_template" > "$cfg_file"
     sed -i "s/iface/"$2"/" "$cfg_file"
 
@@ -101,7 +103,7 @@ then
     sed -i "s/clientiphere/"$3"/" "$client_conf_path"
     content=$(cat "$privkey"); sed -i "s#clientprivkeyhere#"$content"#" "$client_conf_path"
     content=$(cat "$server_pubkey"); sed -i "s#serverpubkeyhere#"$content"#" "$client_conf_path"
-    server_public_ip=$(curl -s ip.me || echo "server_public_ip")
+    server_public_ip=$(cat SERVER_ADDR 2>/dev/null || curl -s ip.me)
     sed -i "s/serverip/"$server_public_ip"/" "$client_conf_path"
 
     # sync wg with new config

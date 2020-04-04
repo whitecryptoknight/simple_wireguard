@@ -37,7 +37,14 @@ ifconfig
 ```
   
 ***
-### Show client config QR code
+### Show client's QR code config
 ```
 ./simple_wg.sh qr john
 ```
+
+***
+### Use custom domain (during init)
+```
+./simple_wg.sh init eth0 mysite.com
+```
+

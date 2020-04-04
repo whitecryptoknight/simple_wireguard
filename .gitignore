@@ -1,5 +1,6 @@
 wg_privkey
 wg_pubkey
+SERVER_ADDR
 *.conf
 *.priv
 *.pub
