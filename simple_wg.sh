@@ -4,6 +4,7 @@ wg_iface="wg0"
 cfg_file="/etc/wireguard/"$wg_iface".conf"
 server_privkey="wg_privkey"
 server_pubkey="wg_pubkey"
+default_subnet="10.10.10.1/24"
 default_port=51820
 
 RED='\033[1;31m'
@@ -11,7 +12,7 @@ CYAN='\033[0;36m'
 NC='\033[0m'
 
 server_conf_template="[Interface]
-Address = 10.10.10.1/24
+Address = "$default_subnet"
 SaveConfig = true
 PrivateKey = privkeyhere
 ListenPort = "$default_port"
@@ -38,12 +39,10 @@ if [[ $1 == "init" ]]
 then
     [[ $# < 2 ]] && "$0" && exit 1
 
-    # add repo
-    add-apt-repository -y ppa:wireguard/wireguard
-    apt update
-
     # install dependencies
-    apt install -y wireguard-dkms wireguard-tools linux-headers-$(uname -r) qrencode
+    [[ $(which wg) && $(which qrencode) ]] || \
+	    (add-apt-repository -y ppa:wireguard/wireguard && \
+	    apt update && apt install -y wireguard qrencode)
 
     # create config file
     umask 077
