@@ -37,19 +37,40 @@ PersistentKeepalive = 21
 
 if [[ $1 == "init" ]]
 then
-    [[ $# < 2 ]] && "$0" && exit 1
+    [[ ! $EUID -eq 0 ]] && echo -e "${RED}Must be run as root${NC}" && exit 1
 
     # install dependencies
-    [[ $(which wg) && $(which qrencode) ]] || \
-	    (add-apt-repository -y ppa:wireguard/wireguard && \
-	    apt update && apt install -y wireguard qrencode)
+    if [[ ! ($(which wg) && $(which qrencode)) ]]
+    then
+        if [[ ! $(apt search -qq wireguard 2>/dev/null) ]]
+        then add-apt-repository -y ppa:wireguard/wireguard
+        fi
+
+        apt update && apt install -y wireguard qrencode
+    fi  
 
     # create config file
     umask 077
-    rm SERVER_ADDR
-    [ $3 ] && echo "$3" > SERVER_ADDR
+    
+    # check arguments
+    iface=$(ip -c -4 -br a | grep UP | cut -d " " -f1)
+    if [[ $# -eq 2 ]]
+    then
+        if [[ $(ip a | grep -c "$2") -eq 0 ]]
+        then 
+            domain="$2"   # second argument is domain
+        else 
+            iface="$2"
+        fi
+    elif [[ $# -eq 3 ]]
+    then
+        iface="$2"
+        domain="$3"
+    fi
+
+    [ "$domain" ] && echo "$domain" > SERVER_ADDR
     echo "$server_conf_template" > "$cfg_file"
-    sed -i "s/iface/"$2"/" "$cfg_file"
+    sed -i "s/iface/"$iface"/" "$cfg_file"
 
     # generate keys
     wg genkey | tee "$server_privkey" | wg pubkey > "$server_pubkey"

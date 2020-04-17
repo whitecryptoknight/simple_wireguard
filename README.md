@@ -16,15 +16,21 @@ cd simple_wireguard
 chmod +x simple_wg.sh
 ```
          
-### 4. Find network interface name (usually eth0)
+### 4. Run
+#### automatically choose network interface
 ```
-ifconfig
-```  
-         
-### 5. Run (as root)
+./simple_wg.sh init
+```
+  
+#### manually choose network interface
+```
+ip -c -4 -br a | grep UP
+```
+then  
 ```
 ./simple_wg.sh init eth0
 ```
+
 ***
 ### Add client
 ```
@@ -53,5 +59,9 @@ ifconfig
 ### Use custom domain (during init)
 ```
 ./simple_wg.sh init eth0 mysite.com
+```
+or  
+```
+./simple_wg.sh init mysite.com
 ```
 
