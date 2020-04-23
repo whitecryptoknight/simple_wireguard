@@ -157,7 +157,7 @@ then
     [[ $# != 2 ]] && "$0" && exit 1
     qrencode -t ansiutf8 < "$2".conf
 else
-    echo -e "Usage:\t "$0" init <interface name>
+    echo -e "Usage:\t "$0" init [interface name] [domain name]
     \t "$0" add <client_name> <10.10.10.x>
     \t "$0" del <client_name>
     \t "$0" list
