@@ -27,6 +27,7 @@ AllowedIPs = clientiphere"
 client_conf_template="[Interface]
 Address = clientiphere
 PrivateKey = clientprivkeyhere
+#DNS = $(echo "$default_subnet"| cut -d "/" -f1)
 
 [Peer]
 PublicKey = serverpubkeyhere
