@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# need to run "pihole restartdns" if using pihole as DNS
+
 wg_iface="wg0"
 cfg_file="/etc/wireguard/"$wg_iface".conf"
 server_privkey="wg_privkey"
